@@ -17,6 +17,15 @@ pub struct Map {
 }
 
 impl Map {
+	pub fn can_enter_tile(&self, point: Point) -> bool {
+		self.in_bounds(point) && self.tiles[map_index(point.x, point.y)] == TileType::Floor
+	}
+	
+	pub fn in_bounds(&self, point: Point) -> bool {
+		point.x >= 0 && point.x < SCREEN_WIDTH
+			&& point.y >= 0 && point.y < SCREEN_HEIGHT
+	}
+	
 	pub fn new() -> Self {
 		Self {
 			tiles: vec![TileType::Floor; NUM_TILES]
@@ -37,6 +46,14 @@ impl Map {
 					}
 				}
 			}
+		}
+	}
+	
+	pub fn try_index(&self, point: Point) -> Option<usize> {
+		if !self.in_bounds(point) {
+			None
+		} else {
+			Some(map_index(point.x, point.y))
 		}
 	}
 }
