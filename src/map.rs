@@ -31,19 +31,36 @@ impl Map {
         }
     }
 
-    pub fn render(&self, ctx: &mut BTerm) {
-        for y in 0..SCREEN_HEIGHT {
-            for x in 0..SCREEN_WIDTH {
-                let index = map_index(x, y);
+    pub fn render(&self, ctx: &mut BTerm, camera: &Camera) {
+        ctx.set_active_console(0);
 
-                match self.tiles[index] {
-                    TileType::Floor => {
-                        ctx.set(x, y, YELLOW, BLACK, to_cp437('.'));
-                    }
-                    TileType::Wall => {
-                        ctx.set(x, y, GREEN, BLACK, to_cp437('#'));
+        for y in camera.viewport.y1 .. camera.viewport.y2 {
+            for x in camera.viewport.x1 .. camera.viewport.x2 {
+                if self.in_bounds(Point::new(x, y)) {
+                    let index = map_index(x, y);
+                    
+                    match self.tiles[index] {
+                        TileType::Floor => {
+                            ctx.set(x - camera.viewport.x1,
+                                y - camera.viewport.y1, 
+                                WHITE, 
+                                BLACK, 
+                                to_cp437('.')
+                            );
+                        }
+                        TileType::Wall => {
+                            ctx.set(
+                                x - camera.viewport.x1, 
+                                y - camera.viewport.y1,
+                                WHITE, 
+                                BLACK, 
+                                to_cp437('#')
+                            );
+                        }
                     }
                 }
+                
+                
             }
         }
     }
