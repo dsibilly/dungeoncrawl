@@ -31,39 +31,38 @@ impl Map {
         }
     }
 
-    pub fn render(&self, ctx: &mut BTerm, camera: &Camera) {
-        ctx.set_active_console(0);
-
-        for y in camera.viewport.y1 .. camera.viewport.y2 {
-            for x in camera.viewport.x1 .. camera.viewport.x2 {
-                if self.in_bounds(Point::new(x, y)) {
-                    let index = map_index(x, y);
-                    
-                    match self.tiles[index] {
-                        TileType::Floor => {
-                            ctx.set(x - camera.viewport.x1,
-                                y - camera.viewport.y1, 
-                                WHITE, 
-                                BLACK, 
-                                to_cp437('.')
-                            );
-                        }
-                        TileType::Wall => {
-                            ctx.set(
-                                x - camera.viewport.x1, 
-                                y - camera.viewport.y1,
-                                WHITE, 
-                                BLACK, 
-                                to_cp437('#')
-                            );
-                        }
-                    }
-                }
-                
-                
-            }
-        }
-    }
+//     pub fn render(&self, ctx: &mut BTerm, camera: &Camera) {
+//         ctx.set_active_console(0);
+// 
+//         for y in camera.viewport.y1..camera.viewport.y2 {
+//             for x in camera.viewport.x1..camera.viewport.x2 {
+//                 if self.in_bounds(Point::new(x, y)) {
+//                     let index = map_index(x, y);
+// 
+//                     match self.tiles[index] {
+//                         TileType::Floor => {
+//                             ctx.set(
+//                                 x - camera.viewport.x1,
+//                                 y - camera.viewport.y1,
+//                                 WHITE,
+//                                 BLACK,
+//                                 to_cp437('.'),
+//                             );
+//                         }
+//                         TileType::Wall => {
+//                             ctx.set(
+//                                 x - camera.viewport.x1,
+//                                 y - camera.viewport.y1,
+//                                 WHITE,
+//                                 BLACK,
+//                                 to_cp437('#'),
+//                             );
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     }
 
     pub fn try_index(&self, point: Point) -> Option<usize> {
         if !self.in_bounds(point) {
