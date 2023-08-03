@@ -3,10 +3,13 @@ use crate::prelude::*;
 #[system]
 #[write_component(Point)]
 #[read_component(MovingRandomly)]
+#[read_component(Health)]
+#[read_component(Player)]
 pub fn random_move(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
-    let mut moving_entities = <(Entity, &mut Point, &MovingRandomly)>::query();
+    let mut movers = <(Entity, &Point, &MovingRandomly)>::query();
+    let mut positions = <(Entity, &Point, &Health)>::query();
 
-    moving_entities.iter_mut(ecs).for_each(|(entity, pos, _)| {
+    movers.iter(ecs).for_each(|(entity, pos, _)| {
         let mut rng = RandomNumberGenerator::new();
         let destination = match rng.range(0, 4) {
             0 => Point::new(-1, 0),
@@ -15,12 +18,36 @@ pub fn random_move(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
             _ => Point::new(0, 1),
         } + *pos;
 
-        commands.push((
-            (),
-            IntendsToMove {
-                entity: *entity,
-                destination,
-            },
-        ));
+        let mut attacked = false;
+        positions
+            .iter(ecs)
+            .filter(|(_, target_pos, _)| **target_pos == destination)
+            .for_each(|(defender, _, _)| {
+                if ecs
+                    .entry_ref(*defender)
+                    .unwrap()
+                    .get_component::<Player>()
+                    .is_ok()
+                {
+                    commands.push((
+                        (),
+                        IntendsToAttack {
+                            attacker: *entity,
+                            defender: *defender,
+                        },
+                    ));
+                }
+                attacked = true;
+            });
+
+        if !attacked {
+            commands.push((
+                (),
+                IntendsToMove {
+                    entity: *entity,
+                    destination,
+                },
+            ));
+        }
     });
 }
